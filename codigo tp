@@ -1,0 +1,155 @@
+ # Cargar la biblioteca necesaria
+  > library(readxl)
+> # Especifica la ubicación de tu archivo XLSX
+  > archivo_xlsx <- "customers.xlsx" 
+  > # Cargar datos desde la  Tabla 1
+> tabla1 <- read_xlsx(archivo_xlsx, sheet = 1)
+> # Cargar datos desde la Tabla 2
+ tabla2 <- read_xlsx(archivo_xlsx, sheet = 2)
+# Cargar la biblioteca necesaria
+ library(dplyr)
+ # Realizar un JOIN en base a la columna "CustomerID"
+   tabla_completa <- merge(tabla1, tabla2, by = "Customer ID")
+        > # Visualizar las primeras filas del conjunto de datos unidos
+          > head(tabla_completa)
+        > # Resumen estadístico de las variables numéricas
+          
+> summary(tabla_completa$CustomerLifetimeValue)
+        
+> summary(tabla_completa$MonthlyPremiumAuto)
+   # Gráfico de barras para mostrar la distribución de la respuesta del cliente
+> ggplot(tabla_completa, aes(x = Response)) + geom_bar()
+        
+# Discretizar las siguientes variables nominales como nuevas columnas
+
+# Agregar columnas para Customer Lifetime Value (Valor de por vida del cliente)
+tabla_completa$CLV_Bins <- cut(tabla_completa$CustomerLifetimeValue, 
+                               breaks = c(0,1999,3999,5999,7999,9999,Inf),
+                               labels = c("< $2000", "$2000-3999"," $4000-5999",
+                                          " $6000-7999", " $8000-9999", "$10000+"))
+# Agregar columnas para Income (Ingresos)
+tabla_completa$IncomeBin <- cut(tabla_completa$Income, breaks = c(0,14999,29999,44999,59999,74999,Inf),
+                                labels = c("< $15000", "$15000-29999","$30000-44999",
+                                           "$45000-59999", "$60000-74999", "$75000+"))
+
+# Agregar columnas para Monthly Premium (Prima Mensual)
+tabla_completa$MoPremiumBin <- cut(tabla_completa$MonthlyPremiumAuto, 
+                                   breaks = c(0,74,99,124,149,Inf),
+                                   labels = c("< $75", "$75-99","$100-124","$125-149","$150+"))
+
+
+
+# Reemplazar NA en IncomeBin con "< $15000"
+tabla_completa$IncomeBin[is.na(tabla_completa$IncomeBin)] <- "< $15000"
+
+
+
+
+
+#######GRAFICOS########
+
+# Cargar bibliotecas necesarias
+library(ggplot2)
+
+library(ggplot2)
+library(dplyr)
+
+
+
+
+
+library(ggplot2)
+# porcentaje de tipos de ofertas de renovacion 
+ggplot(tabla_completa, aes(x = RenewOfferType, fill = PolicyType)) +
+  geom_bar(stat = "count", position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  xlab("Tipo de Oferta de Renovación") +
+  ylab("Porcentaje") +
+  ggtitle("Porcentaje de Tipos de Ofertas de Renovación por Tipo de Póliza") +
+  scale_fill_brewer(palette = "YlOrBr")
+
+library(gridExtra)
+
+# Gráfico de porcentaje de tipo de oferta de renovación por género
+ROGender <- ggplot(tabla_completa, aes(x = RenewOfferType, fill = Gender)) +
+  geom_bar(stat = "count", position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  xlab("Tipo de Oferta de Renovación") +
+  ylab("Porcentaje") +
+  ggtitle("Porcentaje de Tipo de Oferta de Renovación por Género") +
+  scale_fill_brewer(palette = "Set1", labels = c("Femenino", "Masculino"))
+plot(ROGender)
+
+# Gráfico de porcentaje de tipo de oferta de renovación por estado civil
+ROMarital <- ggplot(tabla_completa, aes(x = RenewOfferType, fill = MaritalStatus)) +
+  geom_bar(stat = "count", position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  xlab("Tipo de Oferta de Renovación") +
+  ylab("Porcentaje") +
+  ggtitle("Porcentaje de Tipo de Oferta de Renovación por Estado Civil") +
+  scale_fill_brewer(palette = "Dark2", name = "Estado Civil")
+plot(ROMarital)
+
+# Organizar los gráficos en una cuadrícula
+grid.arrange(ROGender, ROMarital, nrow = 1)
+
+
+# Definir el tamaño de la figura
+options(repr.plot.width = 16, repr.plot.height = 8)
+
+# Gráfico de porcentaje de tipo de oferta de renovación por estado laboral
+ggplot(tabla_completa, aes(x = RenewOfferType, fill = EmploymentStatus)) +
+  geom_bar(stat = "count", position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  xlab("Tipo de Oferta de Renovación") +
+  ylab("Porcentaje") +
+  ggtitle("Porcentaje de Tipo de Oferta de Renovación por Estado Laboral") +
+  scale_fill_brewer(palette = "YlOrBr", name = "Estado Laboral")
+
+# Definir el tamaño de la figura
+options(repr.plot.width = 16, repr.plot.height = 8)
+
+# Gráfico de porcentaje de tipo de oferta de renovación por nivel educativo
+ggplot(tabla_completa, aes(x = RenewOfferType, fill = Education)) +
+  geom_bar(stat = "count", position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  xlab("Tipo de Oferta de Renovación") +
+  ylab("Porcentaje") +
+  ggtitle("Porcentaje de Tipo de Oferta de Renovación por Nivel Educativo") +
+  scale_fill_brewer(palette = "Oranges", name = "Educación")
+
+
+# Gráfico de Porcentaje de Tipo de Oferta de Renovación por Respuesta
+ggplot(tabla_completa, aes(x = RenewOfferType, fill = Response)) +
+  geom_bar(stat = "count", position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  xlab("Tipo de Oferta de Renovación") +
+  ylab("Porcentaje") +
+  ggtitle("Porcentaje de Tipo de Oferta de Renovación por Respuesta")
+
+# Gráfico de Porcentaje de Género por Respuesta
+RPSGenero <- ggplot(tabla_completa, aes(x = Gender, fill = Response)) +
+  geom_bar(stat = "count", position = "fill") +
+  scale_y_continuous(labels = scales::percent)
+plot(RPSGenero)
+
+# Gráfico de Porcentaje de Estado Civil por Respuesta
+RPSEstadoCivil <- ggplot(tabla_completa, aes(x = MaritalStatus, fill = Response)) +
+  geom_bar(stat = "count", position = "fill") +
+  scale_y_continuous(labels = scales::percent)
+plot(RPSEstadoCivil)
+
+# Tasa de Respuesta por Estado de Empleo
+ggplot(tabla_completa, aes(x = EmploymentStatus, fill = Response)) +
+  geom_bar(stat = "count", position = "fill") +
+  scale_y_continuous(labels = scales::percent)
+
+# Tasa de Respuesta por Ingresos
+ggplot(tabla_completa, aes(x = IncomeBin, fill = Response)) +
+  geom_bar(stat = "count", position = "fill") +
+  scale_y_continuous(labels = scales::percent)
+
+# Gráfico de barras para mostrar la distribución de los tipos de ofertas de renovación
+ggplot(tabla_completa, aes(x = RenewOfferType)) + geom_bar()
+
+
